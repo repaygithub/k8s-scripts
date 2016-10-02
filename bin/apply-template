@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+dirname=$1
+
+cd deploy/$dirname
+
+sed "s/BRANCH_PLACEHOLDER/${CI_BRANCH}/g" deployment.yml.template > out/deployment.yml
+
+sed "s/BRANCH_PLACEHOLDER/${CI_BRANCH}/g" configmap.yml.template > out/configmap.yml
+
+sed "s/BRANCH_PLACEHOLDER/${CI_BRANCH}/g" service.yml.template > out/service.yml
