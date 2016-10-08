@@ -17,9 +17,17 @@
     "k8s-apply": "./bin/k8s-apply",
     "minikube-services": "./bin/minikube-services",
     "minikube-services-all": "./bin/minikube-services-all",
-    "apply-template": "./bin/apply-template"
+    "apply-template": "./bin/apply-template",
+    "ensure-kubectl": "./bin/ensure-kubectl",
+    "prepare-kubectl": "./bin/prepare-kubectl"
   },
   "author": "Ross Kukulinski <ross@kukulinski.com>",
+  "contributors":
+  [
+    { "name" : "Justin Mound",
+      "email": "justin@reactiveops.com"
+    }
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
