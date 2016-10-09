@@ -20,6 +20,7 @@
     "apply-template": "./bin/apply-template",
     "ensure-kubectl": "./bin/ensure-kubectl",
     "prepare-kubectl": "./bin/prepare-kubectl",
+    "docker-pull": "./bin/docker-pull",
     "docker-build": "./bin/docker-build",
     "docker-push": "./bin/docker-push"
   },
