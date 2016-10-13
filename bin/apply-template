@@ -9,3 +9,5 @@ sed "s/BRANCH_PLACEHOLDER/${CI_BRANCH}/g" deployment.yml.template > ${DOCKERTAG}
 sed "s/BRANCH_PLACEHOLDER/${CI_BRANCH}/g" configmap.yml.template  > ${DOCKERTAG}.configmap.yml
 
 sed "s/BRANCH_PLACEHOLDER/${CI_BRANCH}/g" service.yml.template    > ${DOCKERTAG}.service.yml
+
+sed "s/BRANCH_PLACEHOLDER/${CI_BRANCH}/g" namespace.yml.template  > ${DOCKERTAG}.namespace.yml
