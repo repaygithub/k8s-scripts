@@ -40,7 +40,7 @@ for index in "${!SERVICE_FILES[@]}"
 do
   SERVICE=${SERVICES[$index]}
   SERVICE_FILE=${SERVICE_FILES[$index]}
-  kubectl $([ -z "$SKIP_TLS_VERIFY" ] && echo "" || echo "--insecure-skip-tls-verify=true ")get service ${SERVICE} --namespace=$NAMESPACE &>/dev/null
+  kubectl $([ -z "$SKIP_TLS_VERIFY" ] && echo "" || echo "--insecure-skip-tls-verify=true ")get service $(basename ${SERVICE}) --namespace=$NAMESPACE &>/dev/null
   if [ $? -ne 0 ]
   then
    echo "Service ${SERVICE} does not exist yet, creating it"
@@ -61,7 +61,7 @@ for index in "${!DEPLOYMENT_FILES[@]}"
 do
   DEPLOYMENT=${DEPLOYMENTS[$index]}
   DEPLOYMENT_FILE=${DEPLOYMENT_FILES[$index]}
-  kubectl $([ -z "$SKIP_TLS_VERIFY" ] && echo "" || echo "--insecure-skip-tls-verify=true ")get deployment ${DEPLOYMENT} --namespace=$NAMESPACE &>/dev/null
+  kubectl $([ -z "$SKIP_TLS_VERIFY" ] && echo "" || echo "--insecure-skip-tls-verify=true ")get deployment $(basename ${DEPLOYMENT}) --namespace=$NAMESPACE &>/dev/null
   if [ $? -ne 0 ]
   then
    echo "Deployment ${DEPLOYMENT} does not exist yet, creating it"
@@ -95,7 +95,7 @@ for index in "${!DEPLOYMENTS[@]}"
 do
   DEPLOYMENT=${DEPLOYMENTS[$index]}
   echo "Checking deployment for $i"
-  timeout.sh -t ${DEPLOY_TIMEOUT} verify-deployment $DEPLOYMENT $NAMESPACE
+  timeout.sh -t ${DEPLOY_TIMEOUT} verify-deployment $(basename $DEPLOYMENT) $NAMESPACE
   result=$?
   if [ "$result" == "143" ] ; then
       echo "------- DEPLOYMENT TIMEOUT FAIL --------"
