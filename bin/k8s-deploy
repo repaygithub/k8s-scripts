@@ -56,6 +56,41 @@ do
 done
 echo "Done deploying Services"
 
+echo "Deploying Jobs"
+for index in "${!JOB_FILES[@]}"
+do
+  JOB=${JOBS[$index]}
+  JOB_FILE=${JOB_FILES[$index]}
+  kubectl $([ -z "$SKIP_TLS_VERIFY" ] && echo "" || echo "--insecure-skip-tls-verify=true ")get job $(basename ${JOB}) --namespace=$NAMESPACE &>/dev/null
+  if [ $? -ne 0 ]
+  then
+   echo "Job ${JOB} does not exist yet, creating it"
+   kubectl $([ -z "$SKIP_TLS_VERIFY" ] && echo "" || echo "--insecure-skip-tls-verify=true ")create -f ${JOB_FILE} --record
+   if [ $? -ne 0 ]
+   then
+     echo "Create failed, aborting"
+     exit 1
+   fi
+  fi
+  if [ -n "$CI_SHA1" ]
+  then
+    echo "Updating image tag from latest to ${CI_SHA1} for ${JOB_FILE}"
+    sed 's/:latest/':${CI_SHA1}'/g;' ${JOB_FILE} > ${JOB_FILE}-${CI_SHA1}
+    echo "Updating ${JOB_FILE}-${CI_SHA1}"
+    JOB_FILE=${JOB_FILE}-${CI_SHA1}
+  fi
+  kubectl $([ -z "$SKIP_TLS_VERIFY" ] && echo "" || echo "--insecure-skip-tls-verify=true ")apply -f ${JOB_FILE} --namespace=$NAMESPACE
+  if [ $? -ne 0 ]
+  then
+    echo "Apply failed, aborting"
+    exit 1
+  fi
+
+done
+
+echo "Done deploying Jobs"
+echo ""
+
 echo "Deploying Deployments"
 for index in "${!DEPLOYMENT_FILES[@]}"
 do

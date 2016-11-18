@@ -68,4 +68,12 @@ do
   DEPLOYMENT_FILES+=($BASEDIR/deploy/$i.deployment.yml)
 done
 echo "[deployment_files]: $DEPLOYMENT_FILES"
+
+echo "[jobs]: $JOBS"
+JOB_FILES=()
+for i in "${JOBS[@]}"
+do
+  JOB_FILES+=($BASEDIR/deploy/$i.job.yml)
+done
+echo "[job_files]: $JOB_FILES"
 echo ""
