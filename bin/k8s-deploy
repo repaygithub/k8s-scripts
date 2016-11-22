@@ -79,7 +79,9 @@ do
     echo "Updating ${JOB_FILE}-${CI_SHA1}"
     JOB_FILE=${JOB_FILE}-${CI_SHA1}
   fi
-  kubectl $([ -z "$SKIP_TLS_VERIFY" ] && echo "" || echo "--insecure-skip-tls-verify=true ")apply -f ${JOB_FILE} --namespace=$NAMESPACE
+  kubectl $([ -z "$SKIP_TLS_VERIFY" ] && echo "" || echo "--insecure-skip-tls-verify=true ")delete job $(basename ${JOB}) --namespace=$NAMESPACE
+  kubectl $([ -z "$SKIP_TLS_VERIFY" ] && echo "" || echo "--insecure-skip-tls-verify=true ")create -f ${JOB_FILE} --record
+  #kubectl $([ -z "$SKIP_TLS_VERIFY" ] && echo "" || echo "--insecure-skip-tls-verify=true ")apply -f ${JOB_FILE} --namespace=$NAMESPACE
   if [ $? -ne 0 ]
   then
     echo "Apply failed, aborting"
