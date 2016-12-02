@@ -22,8 +22,30 @@ apply-files() {
     done
 }
 
-echo "Deploying ConfigMaps"
+create-if-needed-() {
+    declare resource_type=$1 resources="${!2}" files="${!3}"
+    local resource file sha_file
 
+    for index in "${!files[@]}"; do
+      resource="${resources[index]}"
+      file="${files[index]}"
+      kubectl get "${resource_type}" "${resource}" --namespace="$NAMESPACE" &>/dev/null
+      if [ $? -ne 0 ]
+      then
+       echo "${resource_type} ${resource} does not exist yet, creating it"
+       kubectl create -f "${file}" --namespace=$NAMESPACE --record
+       if [ $? -ne 0 ]
+       then
+         echo "Create failed, aborting"
+         exit 1
+       fi
+      else
+       echo "${resource_type} ${resource} already exists"
+      fi
+    done
+}
+
+echo "Deploying ConfigMaps"
 apply-files CONFIGMAP_FILES
 echo "Done deploying ConfigMaps"
 echo ""
@@ -34,69 +56,19 @@ echo "Done deploying Secrets"
 echo ""
 
 echo "Deploying Services"
-for index in "${!SERVICE_FILES[@]}"
-do
-  SERVICE=${SERVICES[$index]##*/}
-  SERVICE_FILE=${SERVICE_FILES[$index]}
-  kubectl get service ${SERVICE} --namespace=$NAMESPACE &>/dev/null
-  if [ $? -ne 0 ]
-  then
-   echo "Service ${SERVICE} does not exist yet, creating it"
-   kubectl create -f ${SERVICE_FILE} --namespace=$NAMESPACE --record
-   if [ $? -ne 0 ]
-   then
-     echo "Create failed, aborting"
-     exit 1
-   fi
-  else
-   echo "Service ${SERVICE} already exists"
-  fi
-done
+create-if-needed service SERVICES SERVICE_FILES
 echo "Done deploying Services"
 echo ""
 
 echo "Deploying Jobs"
-for index in "${!JOBS_FILES[@]}"
-do
-  JOB=${JOBS[$index]##*/}
-  JOB_FILE=${JOBS_FILES[$index]}
-  kubectl get job ${JOB} --namespace=$NAMESPACE &>/dev/null
-  if [ $? -ne 0 ]
-  then
-   echo "Job ${JOB} does not exist yet, creating it"
-   kubectl create -f ${JOB_FILE} --namespace=$NAMESPACE --record
-   if [ $? -ne 0 ]
-   then
-     echo "Create failed, aborting"
-     exit 1
-   fi
-  else
-   echo "Job ${JOB} already exists"
-  fi
-done
+create-if-needed job JOBS JOBS_FILES
 echo "Done deploying Job"
 echo ""
 
 echo "Deploying Ingress Resources"
-for index in "${!INGRESS_FILES[@]}"
-do
-  INGRESS=${INGRESSES[$index]##*/}
-  INGRESS_FILE=${INGRESS_FILES[$index]}
-  kubectl get ingress ${INGRESS} --namespace=$NAMESPACE &>/dev/null
-  if [ $? -ne 0 ]
-  then
-   echo "Ingress Resource ${INGRESS} does not exist yet, creating it"
-   kubectl create -f ${INGRESS_FILE} --namespace=$NAMESPACE --record
-   if [ $? -ne 0 ]
-   then
-     echo "Create failed, aborting"
-     exit 1
-   fi
-  else
-   echo "Ingress Resource ${INGRESS} already exists"
-  fi
-done
+create-if-needed ingress INGRESSES INGRESS_FILES
 echo "Done deploying Ingress Resources"
+echo ""
 
 echo "Deploying Blocking Jobs"
 for index in "${!BLOCKING_JOBS_FILES[@]}"
