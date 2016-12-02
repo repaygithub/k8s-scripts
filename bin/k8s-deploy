@@ -7,6 +7,7 @@ apply-files() {
     local file sha_file
 
     echo "array \"${files[@]}\""
+    echo "array \"${!files[@]}\""
     for file in "${files[@]}"; do
       echo "Deploying file: ${file}"
       echo "Appending ${CI_SHA1} to filename: ${file}"
@@ -46,12 +47,12 @@ create-if-needed-() {
 }
 
 echo "Deploying ConfigMaps"
-apply-files CONFIGMAP_FILES
+# apply-files CONFIGMAP_FILES
 echo "Done deploying ConfigMaps"
 echo ""
 
-echo "Deploying Secrets"
-apply-files SECRET_FILES
+echo "Deploying Secrets" "\"${SECRET_FILES}\""
+apply-files SECRET_FILES[@]
 echo "Done deploying Secrets"
 echo ""
 
