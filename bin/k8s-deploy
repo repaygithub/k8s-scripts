@@ -2,38 +2,34 @@
 
 . k8s-read-config
 
+apply-files() {
+    declare -a files="${!1}"
+    local file sha_file
+
+    echo "array \"${files[@]}\""
+    for file in "${files[@]}"; do
+      echo "Deploying file: ${file}"
+      echo "Appending ${CI_SHA1} to filename: ${file}"
+      sha_file=${file}-${CI_SHA1}
+      cp "${file}" "${sha_file}"
+      echo "Applying ${sha_file}"
+      kubectl apply -f ${sha_file} --namespace=$NAMESPACE --record
+      if [ $? -ne 0 ]
+      then
+        echo "Apply failed, aborting"
+        exit 1
+      fi
+    done
+}
+
 echo "Deploying ConfigMaps"
-for index in "${!CONFIGMAP_FILES[@]}"; do
-  CONFIGMAP_FILE=${CONFIGMAP_FILES[$index]}
-  echo "Appending ${CI_SHA1} to configmap filename"
-  cp ${CONFIGMAP_FILE} ${CONFIGMAP_FILE}-${CI_SHA1}
-  CONFIGMAP_FILE=${CONFIGMAP_FILE}-${CI_SHA1}
-  echo "Applying ${CONFIGMAP_FILE}"
-  kubectl apply -f ${CONFIGMAP_FILE} --namespace=$NAMESPACE --record
-  if [ $? -ne 0 ]
-  then
-    echo "Apply failed, aborting"
-    exit 1
-  fi
-done
+
+apply-files CONFIGMAP_FILES
 echo "Done deploying ConfigMaps"
 echo ""
 
 echo "Deploying Secrets"
-for index in "${!SECRET_FILES[@]}"
-do
-  SECRET_FILE=${SECRET_FILES[$index]}
-  echo "Appending ${CI_SHA1} to secret filename"
-  cp ${SECRET_FILE} ${SECRET_FILE}-${CI_SHA1}
-  SECRET_FILE=${SECRET_FILE}-${CI_SHA1}
-  echo "Applying ${SECRET_FILE}"
-  kubectl apply -f ${SECRET_FILE} --namespace=$NAMESPACE
-  if [ $? -ne 0 ]
-  then
-    echo "Apply failed, aborting"
-    exit 1
-  fi
-done
+apply-files SECRET_FILES
 echo "Done deploying Secrets"
 echo ""
 
