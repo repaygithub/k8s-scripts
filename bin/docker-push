@@ -12,6 +12,7 @@ if [ -z "$CI_BUILD_NUM" ];                  then echo CI_BUILD_NUM must be set; 
 CI_BRANCH=$(echo "${CI_BRANCH}" | tr / _)
 echo "Pushing ${DOCKERTAG}:latest as ${CI_SHA1}, ${CI_BRANCH}, ${CI_BUILD_NUM} to ${EXTERNAL_REGISTRY_BASE_DOMAIN}/${REPOSITORY_NAME}"
 
+echo "Pushing CI_SHA1: ${CI_SHA1}"
 docker tag "${DOCKERTAG}:latest" "${EXTERNAL_REGISTRY_BASE_DOMAIN}/${REPOSITORY_NAME}:${CI_SHA1}"
 if [ $? -ne 0 ]
 then
@@ -25,6 +26,7 @@ then
   exit 1
 fi
 
+echo "Pushing CI_BRANCH: ${CI_BRANCH}"
 docker tag -f "${DOCKERTAG}:latest" "${EXTERNAL_REGISTRY_BASE_DOMAIN}/${REPOSITORY_NAME}:${CI_BRANCH}"
 if [ $? -ne 0 ]
 then
@@ -38,6 +40,7 @@ then
   exit 1
 fi
 
+echo "Pushing CI_BUILD_NUM: ${CI_BUILD_NUM}"
 docker tag "${DOCKERTAG}:latest" "${EXTERNAL_REGISTRY_BASE_DOMAIN}/${REPOSITORY_NAME}:build_${CI_BUILD_NUM}"
 if [ $? -ne 0 ]
 then
